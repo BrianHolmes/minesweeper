@@ -57,53 +57,20 @@ public partial class MinesweeperGame
     {
         var squaresWithNoMinesNearby = new List<(int,int)>();
 
-        if (IsValidPosition(i-1,j-1))
+        for (int m = -1; m <= 1; m++)
         {
-            if (Board[i-1,j-1].NearbyMines == 0 && !Board[i-1,j-1].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i-1,j-1));
-            Board[i-1,j-1].IsChecked = true;
-        }
-        if (IsValidPosition(i-1,j))
-        {
-            if (Board[i-1,j].NearbyMines == 0 && !Board[i-1,j].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i-1,j));
-            Board[i-1,j].IsChecked = true;
-        }
-        if (IsValidPosition(i-1,j+1))
-        {
-            if (Board[i-1,j+1].NearbyMines == 0 && !Board[i-1,j+1].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i-1,j+1));
-            Board[i-1,j+1].IsChecked = true;
-        }
-        if (IsValidPosition(i,j-1))
-        {
-            if (Board[i,j-1].NearbyMines == 0 && !Board[i,j-1].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i,j-1));
-            Board[i,j-1].IsChecked = true;
-        }
-        if (IsValidPosition(i,j+1))
-        {
-            if (Board[i,j+1].NearbyMines == 0 && !Board[i,j+1].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i,j+1));
-            Board[i,j+1].IsChecked = true;
-        }
-        if (IsValidPosition(i+1,j-1))
-        {
-            if (Board[i+1,j-1].NearbyMines == 0 && !Board[i+1,j-1].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i+1,j-1));
-            Board[i+1,j-1].IsChecked = true;
-        }
-        if (IsValidPosition(i+1,j))
-        {
-            if (Board[i+1,j].NearbyMines == 0 && !Board[i+1,j].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i+1,j));
-            Board[i+1,j].IsChecked = true;
-        }
-        if (IsValidPosition(i+1,j+1))
-        {
-            if (Board[i+1,j+1].NearbyMines == 0 && !Board[i+1,j+1].IsChecked)
-                squaresWithNoMinesNearby.Add(new(i+1,j+1));
-            Board[i+1,j+1].IsChecked = true;
+            for (int n = -1; n <= 1; n++)
+            {
+                if (m == 0 && n == 0)
+                    continue;
+                
+                if (IsValidPosition(i+m,j+n))
+                {
+                    if (Board[i+m,j+n].NearbyMines == 0 && !Board[i+m,j+n].IsChecked)
+                        squaresWithNoMinesNearby.Add(new(i+m,j+n));
+                    Board[i+m,j+n].IsChecked = true;
+                }
+            }
         }
         
         foreach (var square in squaresWithNoMinesNearby)
@@ -115,12 +82,12 @@ public partial class MinesweeperGame
         return i >= 0 && j >= 0 && i < 8 && j < 8;
     }
 
-    private Tuple<int,int,bool> GetInputs()
+    private (int,int,bool) GetInputs()
     {
         var row = GetNumberInput("row");
         var column = GetNumberInput("column");
         var flag = GetFlagInput();
-        return new Tuple<int,int,bool>(row, column, flag);
+        return (row, column, flag);
     }
 
     private int GetNumberInput(string inputName)
@@ -200,6 +167,7 @@ public partial class MinesweeperGame
             message += " - Something Went Terribly Wrong!";
         
         Console.WriteLine(message);
+        Console.ReadLine();
     }
 
     private void PopulateSquares()
@@ -237,26 +205,21 @@ public partial class MinesweeperGame
                 if (Board[i,j].IsMine)
                     continue;
                 
-                var count = 0;
+                var totalNearbyMines = 0;
 
-                if (IsValidPosition(i-1,j-1) && Board[i-1,j-1].IsMine)
-                    count++;
-                if (IsValidPosition(i-1,j) && Board[i-1,j].IsMine)
-                    count++;
-                if (IsValidPosition(i-1,j+1) && Board[i-1,j+1].IsMine)
-                    count++;
-                if (IsValidPosition(i,j-1) && Board[i,j-1].IsMine)
-                    count++;
-                if (IsValidPosition(i,j+1) && Board[i,j+1].IsMine)
-                    count++;
-                if (IsValidPosition(i+1,j-1) && Board[i+1,j-1].IsMine)
-                    count++;
-                if (IsValidPosition(i+1,j) && Board[i+1,j].IsMine)
-                    count++;
-                if (IsValidPosition(i+1,j+1) && Board[i+1,j+1].IsMine)
-                    count++;
+                for (int m = -1; m <= 1; m++)
+                {
+                    for (int n = -1; n <= 1; n++)
+                    {
+                        if (m == 0 && n == 0)
+                            continue;
+                        
+                        if (IsValidPosition(i+m,j+n) && Board[i+m,j+n].IsMine)
+                            totalNearbyMines++;
+                    }
+                }
                 
-                Board[i,j].NearbyMines = count;
+                Board[i,j].NearbyMines = totalNearbyMines;
             }
         }
     }
